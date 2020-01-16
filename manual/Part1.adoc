@@ -17,13 +17,14 @@ Move to a parent folder where you want have new project.
 
 To create a new project write this maven command:
 
-```shell
+[source,shell script]
+----
 $ mvn io.quarkus:quarkus-maven-plugin:1.1.0.Final:create \
    -DprojectGroupId=cat.udl.example \
    -DprojectArtifactId=quarkus-example \
    -DprojectVersion=0.1 \
    -DclassName="cat.udl.Example"
-```
+----
 
 Be careful with double quotes that it shouldn't be typographic.
 
@@ -47,7 +48,7 @@ image::1.png[Caption 1,300,align="center"]
 
 You can change and modify Example class and the plugin dev of quarkus detect and make available to your browser immediate you only need to reload.
 
-You could stop server by pressing _Ctrl + C_.
+You could stop server by pressing ``Ctrl + C``.
 
 == Json Rest Service - GET
 
