@@ -36,9 +36,10 @@ You could open src/main/java/cat/udl/Example.java an observe.
 
 In order to try this example you can run this project by typing in your terminal:
 
-```shell
+[source,shell script]
+----
 $ ./mvnw compile quarkus:dev
-```
+----
 
 Go to your browser and write this url : http://localhost:8080/hello
 
@@ -56,16 +57,18 @@ Quarkus base installation doesn’t have the capacity to serialise data to json 
 We need to add an extension to add this feature.
 From terminal you could add this with this command:
 
-```shell
+[source,shell script]
+----
 $ ./mvnw quarkus:add-extension -Dextensions="io.quarkus:quarkus-resteasy-jackson"
-```
+----
 
 Next we create a new Class in order to manage and publish data.
 This class also could be named as POJO (Plain Old Java Object), DTO (Data Transfer Object) or simply Model Class.
 In this example we create class named Person and add name and surname as a String attributes.
 It’s recomendable that these attributes are private and create getters and setters, create a no parameters constructor and also it could create a full parameras attribute:
 
-```java
+[source,java]
+----
 public class Person {
 
     private String name;
@@ -95,7 +98,7 @@ public class Person {
         this.surname = surname;
     }
 }
-```
+----
 
 Copy class Example class to new PersonService class.
 
@@ -105,7 +108,8 @@ We change this with APPLICATION_JSON type.
 We change return type with object that we were created and change body of method creating a sample object and returning this.
 Change @Path annotation of class value to persons too.
 
-```java
+[source,java]
+----
 @Path("/persons")
 public class PersonService {
 
@@ -116,7 +120,7 @@ public class PersonService {
         return person;
     }
 }
-```
+----
 
 Start server and in your browser change hello of url by persons . You could see you object in json format.
 
@@ -129,7 +133,8 @@ For this reason “hello” in our url isn’t correct and we can change with �
 The annotation @Path on class definition define this, we only need to change this.
 This best practices also says that if we make a query to get this top resource of persons we retrieve all persons so that we need to return a List of Persons.
 
-```java
+[source,java]
+----
 @Path("/persons")
 public class Example {
 
@@ -141,14 +146,15 @@ public class Example {
         return Arrays.asList(person1,person2);
     }
 }
-```
+----
 
 image::3.png[Caption 3,500,align="center"]
 
 
 If we get only one of this persons we can define a GET method with a specific resource of this for example persons/0 or persons/0. We can put a Path param as a next sample:
 
-```java
+[source,java]
+----
 @GET
 @Path("{id}")
 @Produces(MediaType.APPLICATION_JSON)
@@ -161,7 +167,7 @@ public Person hello(@PathParam("id") int id) {
     }
     throw new NotFoundException(); // to return 404
 }
-```
+----
 
 image::4.png[Caption 4,300,align="center"]
 
@@ -192,7 +198,8 @@ This method should receive data and store this for this examples we don’t stil
 
 First we create a Repository class in-memory with 2 persons as first example.
 
-```java
+[source,java]
+----
 @ApplicationScoped
 public class PersonsRepository {
 
@@ -239,12 +246,13 @@ public class PersonsRepository {
         return Optional.empty();
     }
 }
-```
+----
 
 Next we replace GET methods to use new Repository class.
 We inject Repository (it’s mandatory to use a default protection of injected attribute)
 
-```java
+[source,java]
+----
 @Inject
 PersonsRepository personsRepository;
 
@@ -261,12 +269,13 @@ public Person get(@PathParam("id") int id) {
     return personsRepository.get(id)
         .orElseThrow(NotFoundException::new);
 }
-```
+----
 
 We can create a POST method.
 When we create a resource by using a POST method best practices define that we may return a 201 status code and a pointer to resource that we create this resource.
 
-```java
+[source,java]
+----
 @POST
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -276,7 +285,7 @@ public Response add(Person person, @Context UriInfo uriInfo) {
     builder.path(Integer.toString(id));
     return Response.created(builder.build()).build();
 }
-```
+----
 
 You should put your attention in a new Annotation Consumes that this indicates what is the format of data that it accepts . The data is received by de parameter of method , in this case a Person.
 @Context UriInfo is an auxiliar parameter to make a response resource url.
@@ -292,7 +301,8 @@ image::6.png[Caption 6,650,align="center"]
 Put is a method to replace an a resource.
 This may accomplish the property of idempotent, so that this returns the resource.
 
-```java
+[source,java]
+----
 @PUT
 @Path("{id}")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -301,7 +311,7 @@ public Person replace(@PathParam("id") int id, Person person) {
     return personsRepository.replace(id, person)
         .orElseThrow(NotFoundException::new);
 }
-```
+----
 
 We try to replace resource /persons/1 You can view a result in your browser:
 
@@ -312,7 +322,8 @@ image::7.png[Caption 7,650,align="center"]
 Delete method as his name says it remove a resource.
 Code:
 
-```java
+[source,java]
+----
 @DELETE
 @Path("{id}")
 @Produces(MediaType.APPLICATION_JSON)
@@ -320,7 +331,7 @@ public Person remove(@PathParam("id") int id) {
     return personsRepository.remove(id)
         .orElseThrow(NotFoundException::new);
 }
-```
+----
 
 Let’s try it.
 
@@ -329,3 +340,52 @@ image::8.png[Caption 8,650,align="center"]
 View result in browser:
 
 image::9.png[Caption 9,500,align="center"]
+
+
+== Run in Docker Container
+
+First you need to make a Dockerfile. This file is a description how to build a cointainer.
+
+[source,dockerfile]
+----
+FROM openjdk:8-jre-slim
+RUN mkdir -p /opt/app/lib
+COPY target/lib/*.jar /opt/app/lib/
+COPY target/quarkus-example-0.1-runner.jar /opt/app/
+EXPOSE 8080
+CMD ["java", "-jar", "/opt/app/quarkus-example-0.1-runner.jar"]
+----
+
+
+
+It starts from a base with system and java jre installed. Next we create a path and copy own jar on this and  finally start service. We need to indicate what pots can be exposed.
+
+To make a jar that will be copied we need to stop quarkus and run next maven comand from Terminal. You need to have a HelloService as when you created  project in order to accomplish test that project has as an example.
+[source,shell script]
+----
+$ mvn package
+----
+
+Next we could build a container from our Dockerfile.
+
+[source,shell script]
+----
+$ docker build . -t quarkus-example
+----
+
+Docker starts to download and build a new image. When it ends we can view all images that docker have. We can view our image tagged with latest.
+
+[source,shell script]
+----
+$ docker images
+REPOSITORY                  TAG           IMAGE ID            CREATED             SIZE
+quarkus-exam                latest        8a5626098a4d        4 minutes ago       184MB
+----
+
+Now we can start this image and test if it works correctly (it’s important you stop before if you have still running the project).
+
+[source,shell script]
+----
+$ docker run -d -p 8080:8080 --name quarkus-example quarkus-example:latest
+----
+We can repeat all operations that we do when application was running directly on our terminal.
