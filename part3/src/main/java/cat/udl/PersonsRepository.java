@@ -32,12 +32,12 @@ public class PersonsRepository {
                 .automatic(true).build();
         return fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
     }
+
     private MongoCollection<Person> getCollection() {
         return mongoClient.getDatabase("quarkus-test")
                 .getCollection("persons", Person.class)
                 .withCodecRegistry(getCodecRegistry());
     }
-
 
     public void add(Person person) {
         person.setId(UUID.randomUUID().toString());

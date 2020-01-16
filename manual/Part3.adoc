@@ -190,3 +190,67 @@ public Person remove(@PathParam("id") String id) {
         .orElseThrow(NotFoundException::new);
 }
 ----
+
+== Jointly Mongo and Quarkus on Docker
+
+In this case we use docker-compose utility.
+This utility help us to run two containers: one with database and other with our services created with quakus and manage internal connection with both containers.
+This utility requiere and a file with YAML format that declares all that we want.
+
+Create ``docker-compose.yml`` file on you project home path. And add this content:
+
+[source,yaml]
+----
+version: '3'
+services:
+  quarkus:
+    build: .
+    environment:
+      - quarkus.mongodb.connection-string=mongodb://mongodb:27017
+    ports:
+      - "8080:8080"
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      - MONGO_DATA_DIR=/data/db
+    volumes:
+      - ./data/db:/data/db
+    ports:
+      - 27017:27017
+----
+
+Yaml files is so important you maintain indentation with 2 spaces.
+This file describes 2 services.
+In quarkus we indicat that build self (it use Dockerfile that we have created before ).
+We configure url of mongo (this use dns name that we set as service name) and exposes ports, finally it says that this depends on mongo service and for this reason system always start after mongo service is available.
+Next Mongo service we define witch image we like to use and configure a volume that we like to store database files.
+In this example we map database port in order to access externally with compass, but it’s not necessary for running system.
+
+When we have this file we need to build and start this.
+(Ensure that other mongo o service in your system are stopped otherwise this fails because the ports get conflict).
+
+[source,shell script]
+----
+$ docker-compose build
+$ docker-compose up
+----
+
+Now you can do all test: get, post, put and delete data with our service as we had done before.
+
+If you want to stop press ``Ctrl + C`` on your terminal.
+And, if you want to remove containers you can delete it:
+
+[source,shell script]
+----
+$ docker-compose down
+----
+
+Docker and docker-compose have a huge number of options you could get more information on their reference webpages:
+
+https://docs.docker.com/
+https://docs.docker.com/compose/reference/
