@@ -85,17 +85,30 @@ public class Person {
     }
 }
 ```
-Focus on Annotation Produces of hello method in class Example. This annotation “says” mime type of data and this set how it must be presented by default it is set with TEXT_PLAIN. We change this with APPLICATION_JSON type. We change return type with object that we were created and change body of method creating a sample object and returning this.
+
+Copy class Example class to new PersonService class.
+
+Focus on Annotation Produces of hello method in class Example.
+This annotation “says” mime type of data and this set how it must be presented by default it is set with TEXT_PLAIN.
+We change this with APPLICATION_JSON type.
+We change return type with object that we were created and change body of method creating a sample object and returning this.
+Change @Path annotation of class value to persons too.
 
 ```java
-@GET
-@Produces(MediaType.APPLICATION_JSON)
-public Person hello() {
-    Person person = new Person("Obi-Wan", "Kenobi");
-    return person;
+@Path("/persons")
+public class PersonService {
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Person getPerson() {
+        Person person = new Person("Obi-Wan", "Kenobi");
+        return person;
+    }
 }
 ```
-Start server and reload your browser. You could see you object in json format.
+Start server and in your browser change hello of url by persons . You could see you object in json format.
+
+image::2.png[Caption 2, 300,align="center"]
 
 ==  Json Rest Service - Path Parameters
 
