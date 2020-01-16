@@ -37,4 +37,14 @@ public class PersonService {
         return Response.created(builder.build()).build();
     }
 
+    @PUT
+    @Path("{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Person replace(@PathParam("id") int id, Person person) {
+        return personsRepository.replace(id, person)
+                .orElseThrow(NotFoundException::new);
+    }
+
+
 }
