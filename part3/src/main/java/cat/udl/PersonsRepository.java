@@ -1,54 +1,70 @@
 package cat.udl;
 
+import com.mongodb.MongoClientSettings;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import org.bson.codecs.configuration.CodecProvider;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.Conventions;
+import org.bson.codecs.pojo.PojoCodecProvider;
+
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import javax.inject.Inject;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 @ApplicationScoped
 public class PersonsRepository {
 
-    ArrayList<Person> personList;
+    @Inject
+    MongoClient mongoClient;
 
-    @PostConstruct
-    public void init() {
-        personList = new ArrayList<>();
-        Person person1 = new Person("Obi-Wan", "Kenobi");
-        Person person2 = new Person("Leia", "Organa");
-        personList.add(person1);
-        personList.add(person2);
+    private CodecRegistry getCodecRegistry() {
+        CodecProvider pojoCodecProvider = PojoCodecProvider.builder()
+                .conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION))
+                .register(Person.class)
+                .automatic(true).build();
+        return fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
+    }
+    private MongoCollection<Person> getCollection() {
+        return mongoClient.getDatabase("quarkus-test")
+                .getCollection("persons", Person.class)
+                .withCodecRegistry(getCodecRegistry());
     }
 
-    public List<Person> getAll(){
-        return personList;
+
+    public void add(Person person) {
+        person.setId(UUID.randomUUID().toString());
+        getCollection().insertOne(person);
     }
 
-
-    public Optional<Person> get(int id) {
-        if (id >= 0 && id < personList.size()) {
-            return Optional.of(personList.get(id));
-        }
-        return Optional.empty();
+    public List<Person> getAll() {
+        return StreamSupport
+                .stream(getCollection().find().spliterator(), false)
+                .collect(Collectors.toList());
     }
 
-    public int add(Person person){
-        personList.add(person);
-        return personList.size()-1;
+    public Optional<Person> get(String id) {
+        return StreamSupport
+                .stream(getCollection().find()
+                        .filter(Filters.eq("_id", id)).spliterator(), false)
+                .findAny();
     }
 
-    public Optional<Person>  replace(int id, Person person){
-        if (id >= 0 && id < personList.size()) {
-            personList.set(id, person);
-            return Optional.of(person);
-        }
-        return Optional.empty();
+    public Optional<Person> replace(String id, Person person) {
+        getCollection().replaceOne(Filters.eq("_id", id), person);
+        return get(person.getId());
     }
 
-    public Optional<Person>  remove(int id){
-        if (id >= 0 && id < personList.size()) {
-            return Optional.of(personList.remove(id));
-        }
-        return Optional.empty();
+    public Optional<Person> remove(String id) {
+        Optional<Person> person = get(id);
+        getCollection().deleteOne(Filters.eq("_id", id));
+        return person;
     }
 }
