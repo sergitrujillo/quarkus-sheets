@@ -1,9 +1,12 @@
 :imagesdir: img
+
 = Part 1 - Rest Services with Quarkus
 :toc:
 
 == Requisites
-- You need a terminal with a shell that you like as: bash, zsh, cmd, etc. Internet connection.
+
+- You need a terminal with a shell that you like as: bash, zsh, cmd, etc.
+Internet connection.
 - Java JDK 8 or 11+ distribution https://adoptopenjdk.net/
 - Apache Maven 3.5.3+ https://maven.apache.org/
 - A text editor or and IDE as you feel more confortable.
@@ -13,6 +16,7 @@
 Move to a parent folder where you want have new project.
 
 To create a new project write this maven command:
+
 ```shell
 $ mvn io.quarkus:quarkus-maven-plugin:1.1.0.Final:create \
    -DprojectGroupId=cat.udl.example \
@@ -20,14 +24,15 @@ $ mvn io.quarkus:quarkus-maven-plugin:1.1.0.Final:create \
    -DprojectVersion=0.1 \
    -DclassName="cat.udl.Example"
 ```
+
 Be careful with double quotes that it shouldn't be typographic.
 
 You can personalise values (more info in https://quarkus.io/guides/maven-tooling) Open folder with project artefact name with your favourite IDE.
 
 == Running for first time
 
-
-The project was created with an example class with a sample Rest service. You could open src/main/java/cat/udl/Example.java an observe.
+The project was created with an example class with a sample Rest service.
+You could open src/main/java/cat/udl/Example.java an observe.
 
 In order to try this example you can run this project by typing in your terminal:
 
@@ -37,7 +42,7 @@ $ ./mvnw compile quarkus:dev
 
 Go to your browser and write this url : http://localhost:8080/hello
 
-image::1.png[Caption 1, 300,align="center"]
+image::1.png[Caption 1,300,align="center"]
 
 You can change and modify Example class and the plugin dev of quarkus detect and make available to your browser immediate you only need to reload.
 
@@ -47,12 +52,18 @@ You could stop server by pressing _Ctrl + C_.
 
 Stop server if you still have it running.
 
-Quarkus base installation doesn’t have the capacity to serialise data to json format. We need to add an extension to add this feature. From terminal you could add this with this command:
+Quarkus base installation doesn’t have the capacity to serialise data to json format.
+We need to add an extension to add this feature.
+From terminal you could add this with this command:
 
 ```shell
 $ ./mvnw quarkus:add-extension -Dextensions="io.quarkus:quarkus-resteasy-jackson"
 ```
-Next we create a new Class in order to manage and publish data. This class also could be named as POJO (Plain Old Java Object), DTO (Data Transfer Object) or simply Model Class. In this example we create class named Person and add name and surname as a String attributes. It’s recomendable that these attributes are private and create getters and setters, create a no parameters constructor and also it could create a full parameras attribute:
+
+Next we create a new Class in order to manage and publish data.
+This class also could be named as POJO (Plain Old Java Object), DTO (Data Transfer Object) or simply Model Class.
+In this example we create class named Person and add name and surname as a String attributes.
+It’s recomendable that these attributes are private and create getters and setters, create a no parameters constructor and also it could create a full parameras attribute:
 
 ```java
 public class Person {
@@ -106,13 +117,17 @@ public class PersonService {
     }
 }
 ```
+
 Start server and in your browser change hello of url by persons . You could see you object in json format.
 
-image::2.png[Caption 2, 300,align="center"]
+image::2.png[Caption 2,300,align="center"]
 
 ==  Json Rest Service - Path Parameters
 
-Best practices of rest services suggest that the url defines the resource that we like to access. For  this reason “hello” in our url isn’t correct and we can change with “persons”. The annotation @Path on class definition define this, we only need to change this. This best practices also says that if we make a query to get this top resource of persons we retrieve  all persons so that we need to return a List of Persons.
+Best practices of rest services suggest that the url defines the resource that we like to access.
+For this reason “hello” in our url isn’t correct and we can change with “persons”.
+The annotation @Path on class definition define this, we only need to change this.
+This best practices also says that if we make a query to get this top resource of persons we retrieve all persons so that we need to return a List of Persons.
 
 ```java
 @Path("/persons")
@@ -120,13 +135,16 @@ public class Example {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Person> hello() {
+    public List<Person> getAll() {
         Person person1 = new Person("Obi-Wan", "Kenobi");
         Person person2 = new Person("Leia", "Organa");
         return Arrays.asList(person1,person2);
     }
 }
 ```
+
+image::3.png[Caption 3,500,align="center"]
+
 
 If we get only one of this persons we can define a GET method with a specific resource of this for example persons/0 or persons/0. We can put a Path param as a next sample:
 
@@ -145,11 +163,15 @@ public Person hello(@PathParam("id") int id) {
 }
 ```
 
+image::4.png[Caption 4,300,align="center"]
+
+
 You can notice that we throw a NotFoundException if the resource not exist this exception produces a 404 response code, it’s a convention to define that resource not exist.
 
 == Json Rest Service - POST, PUT, DELETE
 
-Best practices of defining rest services defining that the URI defines de resource and HTTP methods define the action. We resume this actions at next table:
+Best practices of defining rest services defining that the URI defines de resource and HTTP methods define the action.
+We resume this actions at next table:
 
 .Http Methods
 [width="80%",options="header"]
@@ -162,12 +184,13 @@ Best practices of defining rest services defining that the URI defines de resour
 
 |=========================================================
 
-In previous section we test with GET method and with a browser we can test easily this but other methods we next some tool to test. You could download a plug-in of your browser or you can download some tool as postman (https://www.getpostman.com/) or Insomnia (https://insomnia.rest/).
-
-
+In previous section we test with GET method and with a browser we can test easily this but other methods we next some tool to test.
+You could download a plug-in of your browser or you can download some tool as postman (https://www.getpostman.com/) or Insomnia (https://insomnia.rest/).
 
 === POST
-When we need to create a new resource and a new url  that identify this we use a post method. This method should receive data and store this for this examples we don’t still use database and use Lists as example in an Application scoped class.
+
+When we need to create a new resource and a new url that identify this we use a post method.
+This method should receive data and store this for this examples we don’t still use database and use Lists as example in an Application scoped class.
 
 First we create a Repository class in-memory with 2 persons as first example.
 
@@ -220,7 +243,8 @@ public class PersonsRepository {
 }
 ```
 
-Next we replace GET methods to use new Repository class. We inject Repository (it’s mandatory to use a default protection of injected attribute)
+Next we replace GET methods to use new Repository class.
+We inject Repository (it’s mandatory to use a default protection of injected attribute)
 
 ```java
 @Inject
@@ -241,7 +265,8 @@ public Person get(@PathParam("id") int id) {
 }
 ```
 
-We can create a POST method. When we create a resource by using a POST method best practices define that we may return a 201 status code and a pointer to resource that we create this resource.
+We can create a POST method.
+When we create a resource by using a POST method best practices define that we may return a 201 status code and a pointer to resource that we create this resource.
 
 ```java
 @POST
@@ -255,15 +280,15 @@ public Response add(Person person, @Context UriInfo uriInfo) {
 }
 ```
 
-
-You should put your attention in a new Annotation Consumes that this indicates what is the format of data that it accepts . The data is received by de parameter of method , in this case a Person. @Context UriInfo is an auxiliar parameter to make a response resource url.
+You should put your attention in a new Annotation Consumes that this indicates what is the format of data that it accepts . The data is received by de parameter of method , in this case a Person.
+@Context UriInfo is an auxiliar parameter to make a response resource url.
 
 Now we can test new url in browser:`
 
-
 === PUT
 
-Put is a method to replace an a resource. This may accomplish the property of idempotent, so that this returns the resource.
+Put is a method to replace an a resource.
+This may accomplish the property of idempotent, so that this returns the resource.
 
 ```java
 @PUT
@@ -276,13 +301,12 @@ public Person replace(@PathParam("id") int id, Person person) {
 }
 ```
 
-
-We try to replace resource /persons/1
-You can view a result in your browser:`
+We try to replace resource /persons/1 You can view a result in your browser:`
 
 === DELETE
 
-Delete method as his name says it remove a resource. Code:
+Delete method as his name says it remove a resource.
+Code:
 
 ```java
 @DELETE
@@ -294,8 +318,7 @@ public Person remove(@PathParam("id") int id) {
 }
 ```
 
-Let’s try it
-View result in browser:
+Let’s try it View result in browser:
 
 
 
