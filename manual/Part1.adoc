@@ -173,8 +173,7 @@ You can notice that we throw a NotFoundException if the resource not exist this 
 Best practices of defining rest services defining that the URI defines de resource and HTTP methods define the action.
 We resume this actions at next table:
 
-.Http Methods
-[width="80%",options="header"]
+[width="80%",cols="1,5", options="header", align="center"]
 |=========================================================
 |METHOD |ACTION
 |GET    |Retrive information
@@ -283,7 +282,11 @@ public Response add(Person person, @Context UriInfo uriInfo) {
 You should put your attention in a new Annotation Consumes that this indicates what is the format of data that it accepts . The data is received by de parameter of method , in this case a Person.
 @Context UriInfo is an auxiliar parameter to make a response resource url.
 
-Now we can test new url in browser:`
+image::5.png[Caption 3,500,align="center"]
+
+Now we can test new url in browser:
+
+image::6.png[Caption 3,650,align="center"]
 
 === PUT
 

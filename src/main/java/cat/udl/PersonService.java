@@ -1,31 +1,40 @@
 package cat.udl;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.*;
 import java.util.Arrays;
 import java.util.List;
 
 @Path("/persons")
 public class PersonService {
 
+
+    @Inject
+    PersonsRepository personsRepository;
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Person> getAll() {
-        Person person1 = new Person("Obi-Wan", "Kenobi");
-        Person person2 = new Person("Leia", "Organa");
-        return Arrays.asList(person1,person2);
+        return personsRepository.getAll();
     }
 
     @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Person hello(@PathParam("id") int id) {
-        Person person1 = new Person("Obi-Wan", "Kenobi");
-        Person person2 = new Person("Leia", "Organa");
-        List<Person> people = Arrays.asList(person1, person2);
-        if (id>=0 && id<people.size()){
-            return people.get(id);
-        }
-        throw new NotFoundException(); // to return 404
+    public Person get(@PathParam("id") int id) {
+        return personsRepository.get(id)
+                .orElseThrow(NotFoundException::new);
     }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response add(Person person, @Context UriInfo uriInfo) {
+        int id = personsRepository.add(person);
+        UriBuilder builder = uriInfo.getAbsolutePathBuilder();
+        builder.path(Integer.toString(id));
+        return Response.created(builder.build()).build();
+    }
+
 }
