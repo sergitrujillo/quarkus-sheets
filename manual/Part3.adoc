@@ -1,0 +1,192 @@
+:imagesdir: img3
+
+= Part 3 - Rest Services with Quarkus with Mongo together
+:toc:
+
+== Requisites
+To be done Part 1 and Part 2.
+
+== Configuring Quarkus project
+
+You need to install extension to quarkus in order to get driver to connect to mongo.
+
+[source,shell script]
+----
+$ ./mvnw quarkus:add-extension -Dextensions="io.quarkus:quarkus-mongodb-client"
+----
+
+We need to configure IP and port by using mongo url connection to our project (https://docs.mongodb.com/manual/reference/connection-string/).
+You need to open an existing resource file ``pplication.properties``.
+And set this url by setting new property named quarkus.mongodb.connection-string`.
+
+[source]
+----
+quarkus.mongodb.connection-string = mongodb://localhost:27017`
+----
+
+== Changing Repository
+
+You get profit to early implementation of PersonsRepository.
+This implementation has a list on it storages persons.
+Now, we change this to storage persons in a collection of mongo.
+While we implement new storage we remove all list references.
+
+To get a mongo client we only need to inject this:
+
+[source,java]
+----
+@Inject MongoClient mongoClient;
+----
+
+We need to access to a collection mongo object. Create a new private method to get access to collection.
+
+[source,java]
+----
+private MongoCollection<Document> getCollection() {
+    return mongoClient.getDatabase("quarkus-test").getCollection("persons", Document.class);
+}
+----
+
+
+The default system to storage data is by Document objects that we need to convert.
+In next steps we can do this more easily.
+We do add and getAll methods as a demonstration of managing documents.
+
+Mongo by default primary key is defined by _id attribute of documents this is a hex string representation.
+We need change this types in order to access objects by this id.
+For instance we change int to String of key representation.
+
+[source,java]
+----
+public String add(Person person) {
+    Document document = new Document()
+        .append("name", person.getName())
+        .append("surname", person.getSurname());
+    getCollection().insertOne(document);
+    return document.getObjectId("_id").toString();
+}
+
+public List<Person> getAll() {
+    return StreamSupport
+        .stream(getCollection().find().spliterator(), false)
+        .map(this::convert)
+        .collect(Collectors.toList());
+}
+
+private Person convert(Document document) {
+    Person p = new Person();
+    p.setName(document.getString("name"));
+    p.setSurname(document.getString("surname"));
+    return p;
+}
+----
+
+We can do it with some help using Codecs of mongo. With this the conversion to Document could be almost automatic. We need to change getCollection method with defining object Person and add a codec registry.
+
+[source,java]
+----
+private CodecRegistry getCodecRegistry() {
+    CodecProvider pojoCodecProvider = PojoCodecProvider.builder()
+        .conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION))
+        .register(Person.class)
+        .automatic(true).build();
+    return fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
+}
+private MongoCollection<Person> getCollection() {
+    return mongoClient.getDatabase("quarkus-test")
+        .getCollection("persons", Person.class)
+        .withCodecRegistry(getCodecRegistry());
+}
+----
+
+In order to get information of key of object we need to add this to model. Using annotations of mongo codec helpers we mark what attribute is the primary key. We use a String as a primary key because we don’t like to implement an autoincremental instate of that we use a generated UUID as a primary key
+
+[source,java]
+----
+@BsonId
+private String id;
+----
+
+Add getters and setters and change all references of int by String.
+[source,java]
+----
+public void add(Person person) {
+    person.setId(UUID.randomUUID().toString());
+    getCollection().insertOne(person);
+}
+
+public List<Person> getAll() {
+    return StreamSupport
+        .stream(getCollection().find().spliterator(), false)
+        .collect(Collectors.toList());
+}
+
+public Optional<Person> get(String id) {
+    return StreamSupport
+        .stream(getCollection().find()
+        .filter(Filters.eq("_id", id)).spliterator(), false)
+        .findAny();
+}
+
+
+public Optional<Person> replace(String id, Person person) {
+    getCollection().replaceOne(Filters.eq("_id", id), person);
+    return get(person.getId());
+}
+
+public Optional<Person> remove(String id) {
+    Optional<Person> person = get(id);
+    getCollection().deleteOne(Filters.eq("_id", id));
+    return person;
+}
+----
+
+You could observe that primary key in mongo is stored with _id key.
+For this reason we need find with this key instead of that we have defined in our model.
+
+
+We need to make some changes in PersonsService class and we can do all tests that we had done with List in-memory implantation.
+
+[source,java]
+----
+@GET
+@Produces(MediaType.APPLICATION_JSON)
+public List<Person> getAll() {
+    return personsRepository.getAll();
+}
+
+@GET
+@Path("{id}")
+@Produces(MediaType.APPLICATION_JSON)
+public Person get(@PathParam("id") String id) {
+    return personsRepository.get(id)
+        .orElseThrow(NotFoundException::new);
+}
+
+@POST
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public Response add(Person person, @Context UriInfo uriInfo) {
+    personsRepository.add(person);
+    UriBuilder builder = uriInfo.getAbsolutePathBuilder();
+    builder.path(person.getId());
+    return Response.created(builder.build()).build();
+}
+
+@PUT
+@Path("{id}")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public Person replace(@PathParam("id") String id, Person person) {
+    return personsRepository.replace(id, person)
+        .orElseThrow(NotFoundException::new);
+}
+
+@DELETE
+@Path("{id}")
+@Produces(MediaType.APPLICATION_JSON)
+public Person remove(@PathParam("id") String id) {
+    return personsRepository.remove(id)
+        .orElseThrow(NotFoundException::new);
+}
+----
