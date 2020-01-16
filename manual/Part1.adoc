@@ -1,0 +1,287 @@
+= Part 1 - Rest Services with Quarkus
+:toc:
+
+== Requisites
+- You need a terminal with a shell that you like as: bash, zsh, cmd, etc. Internet connection.
+- Java JDK 8 or 11+ distribution https://adoptopenjdk.net/
+- Apache Maven 3.5.3+ https://maven.apache.org/
+- A text editor or and IDE as you feel more confortable.
+
+== Preparing environment
+
+Move to a parent folder where you want have new project.
+
+To create a new project write this maven command:
+```shell
+$ mvn io.quarkus:quarkus-maven-plugin:1.1.0.Final:create \
+   -DprojectGroupId=cat.udl.example \
+   -DprojectArtifactId=quarkus-example \
+   -DprojectVersion=0.1 \
+   -DclassName="cat.udl.Example"
+```
+Be careful with double quotes that it shouldn't be typographic.
+
+You can personalise values (more info in https://quarkus.io/guides/maven-tooling) Open folder with project artefact name with your favourite IDE.
+
+== Running for first time
+
+
+The project was created with an example class with a sample Rest service. You could open src/main/java/cat/udl/Example.java an observe.
+
+In order to try this example you can run this project by typing in your terminal:
+
+```shell
+$ ./mvnw compile quarkus:dev
+```
+
+Go to your browser and write this url : http://localhost:8080/hello
+
+You can change and modify Example class and the plugin dev of quarkus detect and make available to your browser immediate you only need to reload.
+
+You could stop server by pressing _Ctrl + C_.
+
+== Json Rest Service - GET
+
+Stop server if you still have it running.
+
+Quarkus base installation doesn’t have the capacity to serialise data to json format. We need to add an extension to add this feature. From terminal you could add this with this command:
+
+```shell
+$ ./mvnw quarkus:add-extension -Dextensions="io.quarkus:quarkus-resteasy-jackson"
+```
+Next we create a new Class in order to manage and publish data. This class also could be named as POJO (Plain Old Java Object), DTO (Data Transfer Object) or simply Model Class. In this example we create class named Person and add name and surname as a String attributes. It’s recomendable that these attributes are private and create getters and setters, create a no parameters constructor and also it could create a full parameras attribute:
+
+```java
+public class Person {
+
+    private String name;
+    private String surname;
+
+    public Person() {
+    }
+
+    public Person(String name, String surname) {
+        this.name = name;
+        this.surname = surname;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+}
+```
+Focus on Annotation Produces of hello method in class Example. This annotation “says” mime type of data and this set how it must be presented by default it is set with TEXT_PLAIN. We change this with APPLICATION_JSON type. We change return type with object that we were created and change body of method creating a sample object and returning this.
+
+```java
+@GET
+@Produces(MediaType.APPLICATION_JSON)
+public Person hello() {
+    Person person = new Person("Obi-Wan", "Kenobi");
+    return person;
+}
+```
+Start server and reload your browser. You could see you object in json format.
+
+==  Json Rest Service - Path Parameters
+
+Best practices of rest services suggest that the url defines the resource that we like to access. For  this reason “hello” in our url isn’t correct and we can change with “persons”. The annotation @Path on class definition define this, we only need to change this. This best practices also says that if we make a query to get this top resource of persons we retrieve  all persons so that we need to return a List of Persons.
+
+```java
+@Path("/persons")
+public class Example {
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Person> hello() {
+        Person person1 = new Person("Obi-Wan", "Kenobi");
+        Person person2 = new Person("Leia", "Organa");
+        return Arrays.asList(person1,person2);
+    }
+}
+```
+
+If we get only one of this persons we can define a GET method with a specific resource of this for example persons/0 or persons/0. We can put a Path param as a next sample:
+
+```java
+@GET
+@Path("{id}")
+@Produces(MediaType.APPLICATION_JSON)
+public Person hello(@PathParam("id") int id) {
+    Person person1 = new Person("Obi-Wan", "Kenobi");
+    Person person2 = new Person("Leia", "Organa");
+    List<Person> people = Arrays.asList(person1, person2);
+    if (id>=0 && id<people.size()){
+        return people.get(id);
+    }
+    throw new NotFoundException(); // to return 404
+}
+```
+
+You can notice that we throw a NotFoundException if the resource not exist this exception produces a 404 response code, it’s a convention to define that resource not exist.
+
+== Json Rest Service - POST, PUT, DELETE
+
+Best practices of defining rest services defining that the URI defines de resource and HTTP methods define the action. We resume this actions at next table:
+
+.Http Methods
+[width="80%",options="header"]
+|=========================================================
+|METHOD |ACTION
+|GET    |Retrive information
+|POST   |Create a new resource  (creating new key)
+|PUT    |Create or update a new resource (key is set in url)
+|DELETE |Remove a resource.
+
+|=========================================================
+
+In previous section we test with GET method and with a browser we can test easily this but other methods we next some tool to test. You could download a plug-in of your browser or you can download some tool as postman (https://www.getpostman.com/) or Insomnia (https://insomnia.rest/).
+
+
+
+=== POST
+When we need to create a new resource and a new url  that identify this we use a post method. This method should receive data and store this for this examples we don’t still use database and use Lists as example in an Application scoped class.
+
+First we create a Repository class in-memory with 2 persons as first example.
+
+```java
+@ApplicationScoped
+public class PersonsRepository {
+
+    ArrayList<Person> personList;
+
+    @PostConstruct
+    public void init() {
+        personList = new ArrayList<>();
+        Person person1 = new Person("Obi-Wan", "Kenobi");
+        Person person2 = new Person("Leia", "Organa");
+        personList.add(person1);
+        personList.add(person2);
+    }
+
+    public List<Person> getAll(){
+        return personList;
+    }
+
+
+    public Optional<Person> get(int id) {
+        if (id >= 0 && id < personList.size()) {
+            return Optional.of(personList.get(id));
+        }
+        return Optional.empty();
+    }
+
+    public int add(Person person){
+        personList.add(person);
+        return personList.size()-1;
+    }
+
+    public Optional<Person>  replace(int id, Person person){
+        if (id >= 0 && id < personList.size()) {
+            personList.set(id, person);
+            return Optional.of(person);
+        }
+        return Optional.empty();
+    }
+
+    public Optional<Person>  remove(int id){
+        if (id >= 0 && id < personList.size()) {
+            return Optional.of(personList.remove(id));
+        }
+        return Optional.empty();
+    }
+}
+```
+
+Next we replace GET methods to use new Repository class. We inject Repository (it’s mandatory to use a default protection of injected attribute)
+
+```java
+@Inject
+PersonsRepository personsRepository;
+
+@GET
+@Produces(MediaType.APPLICATION_JSON)
+public List<Person> getAll() {
+    return personsRepository.getAll();
+}
+
+@GET
+@Path("{id}")
+@Produces(MediaType.APPLICATION_JSON)
+public Person get(@PathParam("id") int id) {
+    return personsRepository.get(id)
+        .orElseThrow(NotFoundException::new);
+}
+```
+
+We can create a POST method. When we create a resource by using a POST method best practices define that we may return a 201 status code and a pointer to resource that we create this resource.
+
+```java
+@POST
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public Response add(Person person, @Context UriInfo uriInfo) {
+    int id = personsRepository.add(person);
+    UriBuilder builder = uriInfo.getAbsolutePathBuilder();
+    builder.path(Integer.toString(id));
+    return Response.created(builder.build()).build();
+}
+```
+
+
+You should put your attention in a new Annotation Consumes that this indicates what is the format of data that it accepts . The data is received by de parameter of method , in this case a Person. @Context UriInfo is an auxiliar parameter to make a response resource url.
+
+Now we can test new url in browser:`
+
+
+=== PUT
+
+Put is a method to replace an a resource. This may accomplish the property of idempotent, so that this returns the resource.
+
+```java
+@PUT
+@Path("{id}")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public Person replace(@PathParam("id") int id, Person person) {
+    return personsRepository.replace(id, person)
+        .orElseThrow(NotFoundException::new);
+}
+```
+
+
+We try to replace resource /persons/1
+You can view a result in your browser:`
+
+=== DELETE
+
+Delete method as his name says it remove a resource. Code:
+
+```java
+@DELETE
+@Path("{id}")
+@Produces(MediaType.APPLICATION_JSON)
+public Person remove(@PathParam("id") int id) {
+    return personsRepository.remove(id)
+        .orElseThrow(NotFoundException::new);
+}
+```
+
+Let’s try it
+View result in browser:
+
+
+
+
+
