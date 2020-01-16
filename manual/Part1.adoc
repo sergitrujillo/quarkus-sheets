@@ -1,3 +1,4 @@
+:imagesdir: img
 = Part 1 - Rest Services with Quarkus
 :toc:
 
@@ -35,6 +36,8 @@ $ ./mvnw compile quarkus:dev
 ```
 
 Go to your browser and write this url : http://localhost:8080/hello
+
+image::1.png[Caption 1, 300,align="center"]
 
 You can change and modify Example class and the plugin dev of quarkus detect and make available to your browser immediate you only need to reload.
 
