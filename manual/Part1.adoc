@@ -1,4 +1,4 @@
-:imagesdir: img
+:imagesdir: img1
 
 = Part 1 - Rest Services with Quarkus
 :toc:
@@ -180,7 +180,6 @@ We resume this actions at next table:
 |POST   |Create a new resource  (creating new key)
 |PUT    |Create or update a new resource (key is set in url)
 |DELETE |Remove a resource.
-
 |=========================================================
 
 In previous section we test with GET method and with a browser we can test easily this but other methods we next some tool to test.
@@ -282,11 +281,11 @@ public Response add(Person person, @Context UriInfo uriInfo) {
 You should put your attention in a new Annotation Consumes that this indicates what is the format of data that it accepts . The data is received by de parameter of method , in this case a Person.
 @Context UriInfo is an auxiliar parameter to make a response resource url.
 
-image::5.png[Caption 3,500,align="center"]
+image::5.png[Caption 5,650,align="center"]
 
 Now we can test new url in browser:
 
-image::6.png[Caption 3,650,align="center"]
+image::6.png[Caption 6,650,align="center"]
 
 === PUT
 
@@ -306,7 +305,7 @@ public Person replace(@PathParam("id") int id, Person person) {
 
 We try to replace resource /persons/1 You can view a result in your browser:
 
-image::7.png[Caption 3,650,align="center"]
+image::7.png[Caption 7,650,align="center"]
 
 === DELETE
 
@@ -323,9 +322,10 @@ public Person remove(@PathParam("id") int id) {
 }
 ```
 
-Let’s try it View result in browser:
+Let’s try it.
 
+image::8.png[Caption 8,650,align="center"]
 
+View result in browser:
 
-
-
+image::9.png[Caption 9,500,align="center"]

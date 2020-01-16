@@ -46,5 +46,13 @@ public class PersonService {
                 .orElseThrow(NotFoundException::new);
     }
 
+    @DELETE
+    @Path("{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Person remove(@PathParam("id") int id) {
+        return personsRepository.remove(id)
+                .orElseThrow(NotFoundException::new);
+    }
+
 
 }
