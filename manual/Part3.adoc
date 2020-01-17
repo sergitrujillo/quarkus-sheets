@@ -1,15 +1,11 @@
-:imagesdir: {basedir}img3
+:imagesdir: img3
 
-*Author:* Sergi Trujillo Agramunt +
-*Licence:* Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) image:../cc-by-nc.png[CC BY-NC 4.0, link=https://creativecommons.org/licenses/by-nc/4.0/]
+== Part 3 - Rest Services with Quarkus with Mongo together
 
-= Part 3 - Rest Services with Quarkus with Mongo together
-:toc:
-
-== Requisites
+=== Requisites
 To be done Part 1 and Part 2.
 
-== Configuring Quarkus project
+=== Configuring Quarkus project
 
 You need to install extension to quarkus in order to get driver to connect to mongo.
 
@@ -27,7 +23,7 @@ And set this url by setting new property named quarkus.mongodb.connection-string
 quarkus.mongodb.connection-string = mongodb://localhost:27017`
 ----
 
-== Changing Repository
+=== Changing Repository
 
 You get profit to early implementation of PersonsRepository.
 This implementation has a list on it storages persons.
@@ -194,7 +190,7 @@ public Person remove(@PathParam("id") String id) {
 }
 ----
 
-== Jointly Mongo and Quarkus on Docker
+=== Jointly Mongo and Quarkus on Docker
 
 In this case we use docker-compose utility.
 This utility help us to run two containers: one with database and other with our services created with quakus and manage internal connection with both containers.

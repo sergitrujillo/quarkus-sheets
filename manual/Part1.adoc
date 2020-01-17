@@ -1,12 +1,8 @@
-:imagesdir: {basedir}img1
+:imagesdir: img1
 
-*Author:* Sergi Trujillo Agramunt +
-*Licence:* Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) image:../cc-by-nc.png[CC BY-NC 4.0, link=https://creativecommons.org/licenses/by-nc/4.0/]
+== Part 1 - Rest Services with Quarkus
 
-= Part 1 - Rest Services with Quarkus
-:toc:
-
-== Requisites
+=== Requisites
 
 - You need a terminal with a shell that you like as: bash, zsh, cmd, etc.
 Internet connection.
@@ -14,7 +10,7 @@ Internet connection.
 - Apache Maven 3.5.3+ https://maven.apache.org/
 - A text editor or and IDE as you feel more confortable.
 
-== Preparing environment
+=== Preparing environment
 
 Move to a parent folder where you want have new project.
 
@@ -33,7 +29,7 @@ Be careful with double quotes that it shouldn't be typographic.
 
 You can personalise values (more info in https://quarkus.io/guides/maven-tooling) Open folder with project artefact name with your favourite IDE.
 
-== Running for first time
+=== Running for first time
 
 The project was created with an example class with a sample Rest service.
 You could open src/main/java/cat/udl/Example.java an observe.
@@ -53,7 +49,7 @@ You can change and modify Example class and the plugin dev of quarkus detect and
 
 You could stop server by pressing ``Ctrl + C``.
 
-== Json Rest Service - GET
+=== Json Rest Service - GET
 
 Stop server if you still have it running.
 
@@ -130,7 +126,7 @@ Start server and in your browser change hello of url by persons . You could see 
 
 image::2.png[Caption 2,300,align="center"]
 
-==  Json Rest Service - Path Parameters
+===  Json Rest Service - Path Parameters
 
 Best practices of rest services suggest that the url defines the resource that we like to access.
 For this reason “hello” in our url isn’t correct and we can change with “persons”.
@@ -178,7 +174,7 @@ image::4.png[Caption 4,300,align="center"]
 
 You can notice that we throw a NotFoundException if the resource not exist this exception produces a 404 response code, it’s a convention to define that resource not exist.
 
-== Json Rest Service - POST, PUT, DELETE
+=== Json Rest Service - POST, PUT, DELETE
 
 Best practices of defining rest services defining that the URI defines de resource and HTTP methods define the action.
 We resume this actions at next table:
@@ -346,7 +342,7 @@ View result in browser:
 image::9.png[Caption 9,500,align="center"]
 
 
-== Run in Docker Container
+=== Run in Docker Container
 
 First you need to make a Dockerfile. This file is a description how to build a cointainer.
 

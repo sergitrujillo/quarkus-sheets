@@ -1,19 +1,16 @@
 :imagesdir: img2
 
-*Author:* Sergi Trujillo Agramunt +
-*Licence:* Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) image:../cc-by-nc.png[CC BY-NC 4.0, link=https://creativecommons.org/licenses/by-nc/4.0/]
-
-= Part 2 - Running Mongo as a Docker container
+== Part 2 - Running Mongo as a Docker container
 :toc:
 
-== Requisites
+=== Requisites
 
 - You need  a terminal with a shell that you like as: bash, zsh, cmd, etc.
 - Docker: https://docs.docker.com/install/
 - MongoDB compass: https://docs.mongodb.com/compass/master/install/
 - A text editor or and IDE as you feel more confortable.
 
-== Verifying installation of Docker
+=== Verifying installation of Docker
 
 Open your Terminal and verify you have installed docker CLI.
 
@@ -76,7 +73,7 @@ Version:          0.18.0
 GitCommit:        fec3683
 ----
 
-== Starting Mongo
+=== Starting Mongo
 
 We can get help how to start mongo from docker hub: https://hub.docker.com/_/mongo
 
