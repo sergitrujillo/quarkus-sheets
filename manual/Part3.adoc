@@ -1,5 +1,8 @@
 :imagesdir: img3
 
+*Author:* Sergi Trujillo Agramunt +
+*Licence:* Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) image:../cc-by-nc.png[CC BY-NC 4.0, link=https://creativecommons.org/licenses/by-nc/4.0/]
+
 = Part 3 - Rest Services with Quarkus with Mongo together
 :toc:
 
@@ -224,7 +227,8 @@ services:
       - 27017:27017
 ----
 
-Yaml files is so important you maintain indentation with 2 spaces.
+CAUTION: Yaml files is so important you maintain indentation with 2 spaces.
+
 This file describes 2 services.
 In quarkus we indicat that build self (it use Dockerfile that we have created before ).
 We configure url of mongo (this use dns name that we set as service name) and exposes ports, finally it says that this depends on mongo service and for this reason system always start after mongo service is available.

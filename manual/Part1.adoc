@@ -1,5 +1,8 @@
 :imagesdir: img1
 
+*Author:* Sergi Trujillo Agramunt +
+*Licence:* Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) image:../cc-by-nc.png[CC BY-NC 4.0, link=https://creativecommons.org/licenses/by-nc/4.0/]
+
 = Part 1 - Rest Services with Quarkus
 :toc:
 
