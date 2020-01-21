@@ -175,7 +175,7 @@ image::tutorial-resources/4.png[Caption 4,300,align="center"]
 
 You can notice that we throw a `NotFoundException` if the resource not exist this exception produces a 404 response code, it’s a convention to define that resource not exist.
 
-=== Json Rest Service - POST, PUT, DELETE
+=== Json Rest Service - POST, PUT, DELETE, PATCH
 
 Best practices of defining rest services defining that the URI defines de resource and HTTP methods define the action.
 We resume this actions at next table:
@@ -183,16 +183,17 @@ We resume this actions at next table:
 [%header,cols="1,5",width="80%",align="center"]
 |=========================================================
 |METHOD |ACTION
-|GET    |Retrive information
+|GET    |Retrieve information
 |POST   |Create a new resource  (creating new key)
 |PUT    |Create or update a new resource (key is set in url)
 |DELETE |Remove a resource.
+|PATCH  |Update partial information of resource
 |=========================================================
 
 In previous section we test with `GET` method and with a browser we can test easily this but other methods we next some tool to test.
 You could download a plug-in of your browser or you can download some tool as postman (https://www.getpostman.com/) or Insomnia (https://insomnia.rest/).
 
-=== POST
+==== POST
 
 When we need to create a new resource and a new url that identify this we use a post method.
 This method should receive data and store this for this examples we don’t still use database and use Lists as example in an Application scoped class.
@@ -289,7 +290,7 @@ public Response add(Person person, @Context UriInfo uriInfo) {
 ----
 
 You should put your attention in a new Annotation Consumes that this indicates what is the format of data that it accepts . The data is received by de parameter of method , in this case a Person.
-`@Context UriInfo` is an auxiliar parameter that JAX-RS could provide that it helps to make a response resource url.
+`@Context UriInfo` is an auxiliary parameter that JAX-RS could provide that it helps to make a response resource url.
 
 image::tutorial-resources/5.png[Caption 5,650,align="center"]
 
@@ -297,7 +298,7 @@ Now we can test new url in browser:
 
 image::tutorial-resources/6.png[Caption 6,650,align="center"]
 
-=== PUT
+==== PUT
 
 Put is a method to replace an a resource.
 This may accomplish the property of idempotent, so that this returns the resource.
@@ -318,7 +319,7 @@ We try to replace resource `/persons/1` You can view a result in your browser:
 
 image::tutorial-resources/7.png[Caption 7,650,align="center"]
 
-=== DELETE
+==== DELETE
 
 Delete method as his name says it remove a resource.
 
@@ -340,6 +341,59 @@ image::tutorial-resources/8.png[Caption 8,650,align="center"]
 View result in browser:
 
 image::tutorial-resources/9.png[Caption 9,500,align="center"]
+
+==== PATCH
+
+When when you need to update a resource but you don't like to send all resource, you can do a patch sending only the
+information that you like to change. So that you can do a partial modification of a resource.
+
+To do this modifications is used a special json structure (http://jsonpatch.com/) that define the operations that have to
+do on the original resource (add, replace, remove, etc.).
+
+Jax-rs spec is prepared to manage this and is so easy to manage. This type of json has its own mime-type for this reason `@Consumes`
+annotation need to manage this type with `MediaType.APPLICATION_JSON_PATCH_JSON`. When system receives a query of a Http Patch method
+it automatically make a call to get function to obtain an orginal data, next apply patch and offer this modified object as an argument
+of method. We could call replace method to save object modified if we don't like to do anything more.
+
+[source,java]
+----
+@PATCH
+@Path("{id}")
+@Consumes(MediaType.APPLICATION_JSON_PATCH_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public Person update(@PathParam("id") int id, Person person) {
+    return replace(id, person);
+}
+----
+
+You could make some test with this json examples:
+
+.Replace values
+[source,json]
+----
+[ { "op": "replace", "path": "/name", "value": "name_changed" } ]
+----
+
+.Remove values
+[source,json]
+----
+[ { "op": "delete", "path": "/name"} ]
+----
+
+.Add value
+[source,json]
+----
+[ { "op": "add", "path": "/name", "value": "Obi-Wan"} ]
+----
+
+You could see an example with postman:
+
+image::tutorial-resources/11.png[Caption 11,500,align="center"]
+
+Important content-type header must bé: `application/json-patch+json`
+
+image::tutorial-resources/12.png[Caption 12,500,align="center"]
+
 
 === Run in Docker Container
 

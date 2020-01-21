@@ -3,7 +3,6 @@ package cat.udl;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
-import java.util.Arrays;
 import java.util.List;
 
 @Path("/persons")
@@ -52,6 +51,14 @@ public class PersonService {
     public Person remove(@PathParam("id") int id) {
         return personsRepository.remove(id)
                 .orElseThrow(NotFoundException::new);
+    }
+
+    @PATCH
+    @Path("{id}")
+    @Consumes(MediaType.APPLICATION_JSON_PATCH_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Person update(@PathParam("id") int id, Person person) {
+        return replace(id, person);
     }
 
 

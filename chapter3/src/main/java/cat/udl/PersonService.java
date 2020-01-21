@@ -55,5 +55,13 @@ public class PersonService {
 
     }
 
+    @PATCH
+    @Path("{id}")
+    @Consumes(MediaType.APPLICATION_JSON_PATCH_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Person update(@PathParam("id") String id, Person person) {
+        return replace(id, person);
+    }
+
 
 }
