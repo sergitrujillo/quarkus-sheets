@@ -5,6 +5,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Path("/persons")
 public class PersonService {
@@ -15,8 +16,9 @@ public class PersonService {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Person> getAll() {
-        return personsRepository.getAll();
+    public List<Person> getAll(@QueryParam("limit") @DefaultValue("10") int limit,
+                               @QueryParam("skip") @DefaultValue("0") int skip) {
+        return personsRepository.getAll(skip, limit);
     }
 
     @GET

@@ -194,6 +194,32 @@ public Person remove(@PathParam("id") String id) {
 }
 ----
 
+==== Adding pagination to getAll
+
+Unlike in-memory example when we like to get a subset of results it's better that database manage this, so that we needn't
+load all record and after filter with streams. For this reason we pass to repository skip and limit and manage with database query.
+
+.Changed PersonService
+[source,java]
+----
+@GET
+@Produces(MediaType.APPLICATION_JSON)
+public List<Person> getAll(@QueryParam("limit") @DefaultValue("10") int limit,
+                           @QueryParam("skip") @DefaultValue("0") int skip) {
+    return personsRepository.getAll(skip, limit);
+}
+----
+
+.Changed PersonsRepository
+[source,java]
+----
+public List<Person> getAll(int skip, int limit) {
+    return StreamSupport
+        .stream(getCollection().find().skip(skip).limit(limit).spliterator(), false)
+        .collect(Collectors.toList());
+}
+----
+
 === Jointly Mongo and Quarkus on Docker
 
 In this case we use docker-compose utility.

@@ -44,9 +44,9 @@ public class PersonsRepository {
         getCollection().insertOne(person);
     }
 
-    public List<Person> getAll() {
+    public List<Person> getAll(int skip, int limit) {
         return StreamSupport
-                .stream(getCollection().find().spliterator(), false)
+                .stream(getCollection().find().skip(skip).limit(limit).spliterator(), false)
                 .collect(Collectors.toList());
     }
 
