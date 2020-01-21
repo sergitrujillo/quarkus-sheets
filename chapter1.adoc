@@ -128,7 +128,46 @@ Start server and in your browser change hello of url by persons . You could see 
 
 image::tutorial-resources/2.png[Caption 2,300,align="center"]
 
-===  Json Rest Service - Path Parameters
+
+=== Json Rest service - Query Parameters
+
+Query parameters are called the parameters that are jointly with the url. The fists parameter is written next url,
+it starts with question mark `?` then key and value separated with equal  `=`.
+Next parameters are separated by ampersand `&` and key value separated with equal `=` too.
+
+.Example url with query parameters
+[url]
+----
+http://localhost:8080/persons?skip=1&limit=1
+----
+
+To collect this parameters we need the annotation @QueryParameter. This annotation can be used in different ways,
+for example as a decorator of parameter of a method or of a class attribute.
+
+We can control if parameter es omitted we can set a default value and manage a default behaviour. Is needed a other
+annotation `@DefaultValue` to control this.
+
+The type is automatically converted and if type could fit throw a 404 page.
+
+.Get example with QueryParams
+[source, java]
+----
+@GET
+@Produces(MediaType.APPLICATION_JSON)
+public List<Person> getAll(@QueryParam("limit") @DefaultValue("10") int limit,
+                           @QueryParam("skip") @DefaultValue("0") int skip) {
+    return personsRepository.getAll().stream()
+        .skip(skip)
+        .limit(limit)
+        .collect(Collectors.toList());
+}
+----
+
+You could try before url and you obtaind a only one result and is the second element of array (limit 1, skip 1).
+
+
+
+=== Json Rest Service - Path Parameters
 
 Best practices of rest services suggest that the url defines the resource that we like to access.
 For this reason “hello” in our url isn’t correct and we shout change with "persons" on `@Path` class annotation that it identifies better our resources.
