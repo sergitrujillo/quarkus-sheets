@@ -1,2 +1,0 @@
-:basedir: ../manual/
-include::../manual/Part1.adoc[]

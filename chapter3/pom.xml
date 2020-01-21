@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>cat.udl.example</groupId>
-  <artifactId>part3</artifactId>
+  <artifactId>chapter3</artifactId>
   <version>0.1</version>
   <properties>
     <compiler-plugin.version>3.8.1</compiler-plugin.version>

@@ -1,11 +1,9 @@
-:imagesdir: img2
-
+:icons: font
 == Part 2 - Running Mongo as a Docker container
-:toc:
 
 === Requisites
 
-- You need  a terminal with a shell that you like as: bash, zsh, cmd, etc.
+- You need a terminal with a shell that you like as: bash, zsh, cmd, etc.
 - Docker: https://docs.docker.com/install/
 - MongoDB compass: https://docs.mongodb.com/compass/master/install/
 - A text editor or and IDE as you feel more confortable.
@@ -19,6 +17,7 @@ Open your Terminal and verify you have installed docker CLI.
 $ docker —version
 Docker version 19.03.2, build 6a30dfc
 ----
+
 And verify you have started docker service.
 
 #Without service:#
@@ -120,7 +119,6 @@ config  0.000GB
 local   0.000GB
 ----
 
-
 We can create our db and save some data:
 
 [source,javascript]
@@ -145,17 +143,16 @@ We can retrieve data:
 { "_id" : ObjectId("5e086b0e51c59585c51247a4"), "firstname" : "Leia", "lastname" : "Organa" }
 ----
 
+Type `exit` twice to go out of container.
 
-Type ``exit`` twice to go out of container.
-
-Go to Terminal that have mongo container started and press ``Ctrl + C`` to stop this.
+Go to Terminal that have mongo container started and press `Ctrl + C` to stop this.
 
 We can restart container and try to get data but we can’t retrieve any saved data because containers are ephemeral and when it stops they don’t maintain any changes of this.
 
 docker container restart mongodb
 
-
-You can stop and delete this and the end. Any start of mongo with the same name you need to do this.
+You can stop and delete this and the end.
+Any start of mongo with the same name you need to do this.
 
 [source,shell script]
 ----
@@ -163,7 +160,10 @@ $ docker container stop mongodb
 $ docker container rm mongodb
 ----
 
-Docker allow us to bind persistent volume in order to don’t loose data.  The simplest way is map a local path to path of container. So that, we maintain data outer of container and container continue being ephemeral. We added -d option to start in detached mode.
+Docker allow us to bind persistent volume in order to don’t loose data.
+The simplest way is map a local path to path of container.
+So that, we maintain data outer of container and container continue being ephemeral.
+We added -d option to start in detached mode.
 
 [source,shell script]
 ----
@@ -177,11 +177,13 @@ Finally if we like to access from external of container we can map ports.
 $ docker run -d -p 27017:27017 --name mongodb mongo:latest
 ----
 
-We can connect with compass with default values. Open compass and simply click connect.
+We can connect with compass with default values.
+Open compass and simply click connect.
 
-image::1.png[Caption 1,700,align="center"]
+image:tutorial-resources/10.png[Caption 1,700,align="center"]
 
-Finally you can do all binds. You can bind a persisten volume and a map a port:
+Finally you can do all binds.
+You can bind a persistent volume and a map a port:
 
 [source,shell script]
 ----

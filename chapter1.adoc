@@ -1,6 +1,5 @@
-:imagesdir: img1
-
-== Part 1 - Rest Services with Quarkus
+:icons: font
+== Chapter 1 - Rest Services with Quarkus
 
 === Requisites
 
@@ -9,6 +8,7 @@ Internet connection.
 - Java JDK 8 or 11+ distribution https://adoptopenjdk.net/
 - Apache Maven 3.5.3+ https://maven.apache.org/
 - A text editor or and IDE as you feel more confortable.
+
 
 === Preparing environment
 
@@ -25,9 +25,9 @@ $ mvn io.quarkus:quarkus-maven-plugin:1.1.0.Final:create \
    -DclassName="cat.udl.Example"
 ----
 
-Be careful with double quotes that it shouldn't be typographic.
+CAUTION: Be careful with double quotes that it shouldn't be typographic.
 
-You can personalise values (more info in https://quarkus.io/guides/maven-tooling) Open folder with project artefact name with your favourite IDE.
+TIP: You can personalise values (more info in https://quarkus.io/guides/maven-tooling) Open folder with project artefact name with your favourite IDE.
 
 === Running for first time
 
@@ -43,7 +43,7 @@ $ ./mvnw compile quarkus:dev
 
 Go to your browser and write this url : http://localhost:8080/hello
 
-image::1.png[Caption 1,300,align="center"]
+image::tutorial-resources/1.png[Caption 1,300,align="center"]
 
 You can change and modify Example class and the plugin dev of quarkus detect and make available to your browser immediate you only need to reload.
 
@@ -103,10 +103,10 @@ public class Person {
 Copy class Example class to new PersonService class.
 
 Focus on Annotation Produces of hello method in class Example.
-This annotation “says” mime type of data and this set how it must be presented by default it is set with TEXT_PLAIN.
-We change this with APPLICATION_JSON type.
+This annotation “says” mime type of data and this set how it must be presented by default it is set with `TEXT_PLAIN`.
+We change this with `APPLICATION_JSON` type.
 We change return type with object that we were created and change body of method creating a sample object and returning this.
-Change @Path annotation of class value to persons too.
+Change `@Path_` annotation of class value to persons too.
 
 [source,java]
 ----
@@ -122,64 +122,65 @@ public class PersonService {
 }
 ----
 
+IMPORTANT: Change @Path("/hello") with @Path("/persons") at next section it was explained why.
+
 Start server and in your browser change hello of url by persons . You could see you object in json format.
 
-image::2.png[Caption 2,300,align="center"]
+image::tutorial-resources/2.png[Caption 2,300,align="center"]
 
 ===  Json Rest Service - Path Parameters
 
 Best practices of rest services suggest that the url defines the resource that we like to access.
-For this reason “hello” in our url isn’t correct and we can change with “persons”.
-The annotation @Path on class definition define this, we only need to change this.
-This best practices also says that if we make a query to get this top resource of persons we retrieve all persons so that we need to return a List of Persons.
+For this reason “hello” in our url isn’t correct and we shout change with "persons" on `@Path` class annotation that it identifies better our resources.
+The annotation `@Path` could be on class and on methods and it was defining an hierarchy uri.
+This best practices also says that if we make a query to get this top resource of persons we retrieve all resources so that we need to return a List of all Persons.
+
+[source,java]
+----
+@GET
+@Produces(MediaType.APPLICATION_JSON)
+public List<Person> getAll() {
+    Person person1 = new Person("Obi-Wan", "Kenobi");
+    Person person2 = new Person("Leia", "Organa");
+    return Arrays.asList(person1,person2);
+}
+----
+
+image::tutorial-resources/3.png[Caption 3,500,align="center"]
+
+
+If we get only one of this persons we can define a `GET` method with a specific resource of this for example `persons/0` or `persons/1`. We can put a Path param as a next sample:
 
 [source,java]
 ----
 @Path("/persons")
 public class Example {
-
     @GET
+    @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Person> getAll() {
+    public Person hello(@PathParam("id") int id) {
         Person person1 = new Person("Obi-Wan", "Kenobi");
         Person person2 = new Person("Leia", "Organa");
-        return Arrays.asList(person1,person2);
+        List<Person> people = Arrays.asList(person1, person2);
+        if (id>=0 && id<people.size()){
+            return people.get(id);
+        }
+        throw new NotFoundException(); // to return 404
     }
 }
 ----
 
-image::3.png[Caption 3,500,align="center"]
+image::tutorial-resources/4.png[Caption 4,300,align="center"]
 
 
-If we get only one of this persons we can define a GET method with a specific resource of this for example persons/0 or persons/0. We can put a Path param as a next sample:
-
-[source,java]
-----
-@GET
-@Path("{id}")
-@Produces(MediaType.APPLICATION_JSON)
-public Person hello(@PathParam("id") int id) {
-    Person person1 = new Person("Obi-Wan", "Kenobi");
-    Person person2 = new Person("Leia", "Organa");
-    List<Person> people = Arrays.asList(person1, person2);
-    if (id>=0 && id<people.size()){
-        return people.get(id);
-    }
-    throw new NotFoundException(); // to return 404
-}
-----
-
-image::4.png[Caption 4,300,align="center"]
-
-
-You can notice that we throw a NotFoundException if the resource not exist this exception produces a 404 response code, it’s a convention to define that resource not exist.
+You can notice that we throw a `NotFoundException` if the resource not exist this exception produces a 404 response code, it’s a convention to define that resource not exist.
 
 === Json Rest Service - POST, PUT, DELETE
 
 Best practices of defining rest services defining that the URI defines de resource and HTTP methods define the action.
 We resume this actions at next table:
 
-[width="80%",cols="1,5", options="header", align="center"]
+[%header,cols="1,5",width="80%",align="center"]
 |=========================================================
 |METHOD |ACTION
 |GET    |Retrive information
@@ -188,7 +189,7 @@ We resume this actions at next table:
 |DELETE |Remove a resource.
 |=========================================================
 
-In previous section we test with GET method and with a browser we can test easily this but other methods we next some tool to test.
+In previous section we test with `GET` method and with a browser we can test easily this but other methods we next some tool to test.
 You could download a plug-in of your browser or you can download some tool as postman (https://www.getpostman.com/) or Insomnia (https://insomnia.rest/).
 
 === POST
@@ -196,7 +197,7 @@ You could download a plug-in of your browser or you can download some tool as po
 When we need to create a new resource and a new url that identify this we use a post method.
 This method should receive data and store this for this examples we don’t still use database and use Lists as example in an Application scoped class.
 
-First we create a Repository class in-memory with 2 persons as first example.
+First we create a Repository class in-memory with 2 persons as first example. We use an @ApplicationScoped` of CDI specs that it helps to maintain same instance during all application live.
 
 [source,java]
 ----
@@ -248,7 +249,7 @@ public class PersonsRepository {
 }
 ----
 
-Next we replace GET methods to use new Repository class.
+Next we replace `GET` methods to use new Repository class.
 We inject Repository (it’s mandatory to use a default protection of injected attribute)
 
 [source,java]
@@ -271,8 +272,8 @@ public Person get(@PathParam("id") int id) {
 }
 ----
 
-We can create a POST method.
-When we create a resource by using a POST method best practices define that we may return a 201 status code and a pointer to resource that we create this resource.
+We can create a `POST` method.
+When we create a resource by using a `POST` method best practices define that we may return a 201 status code and a pointer to resource that we create this resource.
 
 [source,java]
 ----
@@ -288,13 +289,13 @@ public Response add(Person person, @Context UriInfo uriInfo) {
 ----
 
 You should put your attention in a new Annotation Consumes that this indicates what is the format of data that it accepts . The data is received by de parameter of method , in this case a Person.
-@Context UriInfo is an auxiliar parameter to make a response resource url.
+`@Context UriInfo` is an auxiliar parameter that JAX-RS could provide that it helps to make a response resource url.
 
-image::5.png[Caption 5,650,align="center"]
+image::tutorial-resources/5.png[Caption 5,650,align="center"]
 
 Now we can test new url in browser:
 
-image::6.png[Caption 6,650,align="center"]
+image::tutorial-resources/6.png[Caption 6,650,align="center"]
 
 === PUT
 
@@ -313,14 +314,13 @@ public Person replace(@PathParam("id") int id, Person person) {
 }
 ----
 
-We try to replace resource /persons/1 You can view a result in your browser:
+We try to replace resource `/persons/1` You can view a result in your browser:
 
-image::7.png[Caption 7,650,align="center"]
+image::tutorial-resources/7.png[Caption 7,650,align="center"]
 
 === DELETE
 
 Delete method as his name says it remove a resource.
-Code:
 
 [source,java]
 ----
@@ -335,16 +335,16 @@ public Person remove(@PathParam("id") int id) {
 
 Let’s try it.
 
-image::8.png[Caption 8,650,align="center"]
+image::tutorial-resources/8.png[Caption 8,650,align="center"]
 
 View result in browser:
 
-image::9.png[Caption 9,500,align="center"]
-
+image::tutorial-resources/9.png[Caption 9,500,align="center"]
 
 === Run in Docker Container
 
-First you need to make a Dockerfile. This file is a description how to build a cointainer.
+First you need to make a Dockerfile.
+This file is a description how to build a container.
 
 [source,dockerfile]
 ----
@@ -356,11 +356,13 @@ EXPOSE 8080
 CMD ["java", "-jar", "/opt/app/quarkus-example-0.1-runner.jar"]
 ----
 
+It starts from a base with system and java jre installed.
+Next we create a path and copy own jar on this and finally start service.
+We need to indicate what pots can be exposed.
 
+To make a jar that will be copied we need to stop quarkus and run next maven command from Terminal.
+You need to have a HelloService as when you created project in order to accomplish test that project has as an example.
 
-It starts from a base with system and java jre installed. Next we create a path and copy own jar on this and  finally start service. We need to indicate what pots can be exposed.
-
-To make a jar that will be copied we need to stop quarkus and run next maven comand from Terminal. You need to have a HelloService as when you created  project in order to accomplish test that project has as an example.
 [source,shell script]
 ----
 $ mvn package
@@ -373,7 +375,9 @@ Next we could build a container from our Dockerfile.
 $ docker build . -t quarkus-example
 ----
 
-Docker starts to download and build a new image. When it ends we can view all images that docker have. We can view our image tagged with latest.
+Docker starts to download and build a new image.
+When it ends we can view all images that docker have.
+We can view our image tagged with latest.
 
 [source,shell script]
 ----
@@ -388,4 +392,5 @@ Now we can start this image and test if it works correctly (it’s important you
 ----
 $ docker run -d -p 8080:8080 --name quarkus-example quarkus-example:latest
 ----
+
 We can repeat all operations that we do when application was running directly on our terminal.

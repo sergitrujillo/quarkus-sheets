@@ -1,20 +1,18 @@
-:basedir: ./manual/
 = Quarkus Rest Services and Mongo usage Tutorial
+Doc Writer <sergi.trujillo@gmail.com>
+:imagesdir: tutorial-resources
+:icons: font
 :toc:
 
+This project was created in pourpose to guide to make an example projecte using quarkus, mongo and docker techonologies.
 
-include::{basedir}Part1.adoc[]
+You get a manual with step by step guide and example code on any chapter.
 
-include::{basedir}Part2.adoc[]
+include::licence.adoc[]
 
-include::{basedir}Part3.adoc[]
+include::chapter1.adoc[]
 
-:imagesdir: {basedir}
-== Licences
-Documentations and examples included:
+include::chapter2.adoc[]
 
-*Author:* Sergi Trujillo Agramunt +
-*Licence:* Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) image:./cc-by-nc.png[CC BY-NC 4.0, link=https://creativecommons.org/licenses/by-nc/4.0/]
+include::chapter3.adoc[]
 
-Quarkus is open. All dependencies of this project are available under the Apache Software License 2.0 or compatible license. https://quarkus.io/faq/
-Consult Mongo Licencing terms: https://www.mongodb.com/community/licensing

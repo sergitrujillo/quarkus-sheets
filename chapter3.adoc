@@ -1,8 +1,8 @@
-:imagesdir: img3
-
+:icons: font
 == Part 3 - Rest Services with Quarkus with Mongo together
 
 === Requisites
+
 To be done Part 1 and Part 2.
 
 === Configuring Quarkus project
@@ -15,8 +15,8 @@ $ ./mvnw quarkus:add-extension -Dextensions="io.quarkus:quarkus-mongodb-client"
 ----
 
 We need to configure IP and port by using mongo url connection to our project (https://docs.mongodb.com/manual/reference/connection-string/).
-You need to open an existing resource file ``pplication.properties``.
-And set this url by setting new property named quarkus.mongodb.connection-string`.
+You need to open an existing resource file `application.properties`.
+And set this url by setting new property named `quarkus.mongodb.connection-string`.
 
 [source]
 ----
@@ -26,7 +26,7 @@ quarkus.mongodb.connection-string = mongodb://localhost:27017`
 === Changing Repository
 
 You get profit to early implementation of PersonsRepository.
-This implementation has a list on it storages persons.
+This implementation has a list on it storage persons.
 Now, we change this to storage persons in a collection of mongo.
 While we implement new storage we remove all list references.
 
@@ -37,7 +37,8 @@ To get a mongo client we only need to inject this:
 @Inject MongoClient mongoClient;
 ----
 
-We need to access to a collection mongo object. Create a new private method to get access to collection.
+We need to access to a collection mongo object.
+Create a new private method to get access to collection.
 
 [source,java]
 ----
@@ -45,7 +46,6 @@ private MongoCollection<Document> getCollection() {
     return mongoClient.getDatabase("quarkus-test").getCollection("persons", Document.class);
 }
 ----
-
 
 The default system to storage data is by Document objects that we need to convert.
 In next steps we can do this more easily.
@@ -80,7 +80,9 @@ private Person convert(Document document) {
 }
 ----
 
-We can do it with some help using Codecs of mongo. With this the conversion to Document could be almost automatic. We need to change getCollection method with defining object Person and add a codec registry.
+We can do it with some help using Codecs of mongo.
+With this the conversion to Document could be almost automatic.
+We need to change getCollection method with defining object Person and add a codec registry.
 
 [source,java]
 ----
@@ -98,7 +100,9 @@ private MongoCollection<Person> getCollection() {
 }
 ----
 
-In order to get information of key of object we need to add this to model. Using annotations of mongo codec helpers we mark what attribute is the primary key. We use a String as a primary key because we don’t like to implement an autoincremental instate of that we use a generated UUID as a primary key
+In order to get information of key of object we need to add this to model.
+Using annotations of mongo codec helpers we mark what attribute is the primary key.
+We use a String as a primary key because we don’t like to implement an autoincrement control, instead of that we use a generated UUID as a primary key
 
 [source,java]
 ----
@@ -107,6 +111,7 @@ private String id;
 ----
 
 Add getters and setters and change all references of int by String.
+
 [source,java]
 ----
 public void add(Person person) {
@@ -142,7 +147,6 @@ public Optional<Person> remove(String id) {
 
 You could observe that primary key in mongo is stored with _id key.
 For this reason we need find with this key instead of that we have defined in our model.
-
 
 We need to make some changes in PersonsService class and we can do all tests that we had done with List in-memory implantation.
 
@@ -194,9 +198,10 @@ public Person remove(@PathParam("id") String id) {
 
 In this case we use docker-compose utility.
 This utility help us to run two containers: one with database and other with our services created with quakus and manage internal connection with both containers.
-This utility requiere and a file with YAML format that declares all that we want.
+This utility require and a file with YAML format that declares all that we want.
 
-Create ``docker-compose.yml`` file on you project home path. And add this content:
+Create `docker-compose.yml` file on you project home path.
+And add this content:
 
 [source,yaml]
 ----
@@ -242,7 +247,7 @@ $ docker-compose up
 
 Now you can do all test: get, post, put and delete data with our service as we had done before.
 
-If you want to stop press ``Ctrl + C`` on your terminal.
+If you want to stop press `Ctrl + C` on your terminal.
 And, if you want to remove containers you can delete it:
 
 [source,shell script]
