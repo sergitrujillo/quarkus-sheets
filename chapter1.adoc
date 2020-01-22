@@ -27,7 +27,7 @@ $ mvn io.quarkus:quarkus-maven-plugin:1.1.0.Final:create \
 
 CAUTION: Be careful with double quotes that it shouldn't be typographic.
 
-TIP: You can personalise values (more info in https://quarkus.io/guides/maven-tooling) Open folder with project artefact name with your favourite IDE.
+NOTE: You can personalise values (more info in https://quarkus.io/guides/maven-tooling) Open folder with project artefact name with your favourite IDE.
 
 === Running for first time
 
@@ -140,6 +140,13 @@ Next parameters are separated by ampersand `&` and key value separated with equa
 ----
 http://localhost:8080/persons?skip=1&limit=1
 ----
+
+NOTE: This type of parameters are useful to change to change the behaviour of default request.
+Tipically is only recomended to use for filters, orders and paginations.
+It’s recommended when we like to maintain the same results with same URL. +
+No it’s recommended to use this type of params to pass any data to resources.
+You shoud use post, put, patch methods and all data shoud be contained on the body of request.
+
 
 To collect this parameters we need the annotation @QueryParameter. This annotation can be used in different ways,
 for example as a decorator of parameter of a method or of a class attribute.
