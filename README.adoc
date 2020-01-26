@@ -8,6 +8,8 @@ This project was created in pourpose to guide to make an example projecte using 
 
 You get a manual with step by step guide and example code on any chapter.
 
+Github link: https://github.com/sergitrujillo/quarkus-sheets
+
 include::licence.adoc[]
 
 include::chapter1.adoc[]
