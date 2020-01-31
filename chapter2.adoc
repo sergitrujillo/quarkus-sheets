@@ -1,5 +1,5 @@
 :icons: font
-== Part 2 - Running Mongo as a Docker container
+== Chapter 2 - Running Mongo as a Docker container
 
 === Requisites
 

@@ -1,5 +1,5 @@
 :icons: font
-== Part 3 - Rest Services with Quarkus with Mongo together
+== Chapter 3 - Rest Services with Quarkus with Mongo together
 
 === Requisites
 
