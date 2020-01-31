@@ -1,0 +1,3 @@
+:basedir: ../
+:imagesdir: ../
+include::../chapter4.adoc[]

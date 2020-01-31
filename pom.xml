@@ -9,5 +9,6 @@
     <modules>
         <module>chapter1</module>
         <module>chapter3</module>
+        <module>chapter4</module>
     </modules>
 </project>

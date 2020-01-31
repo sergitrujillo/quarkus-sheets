@@ -1,0 +1,159 @@
+:icons: font
+== Chapter 4 - Simplifying access to mongo with panache
+
+=== Requisites
+
+This Chapter starts from Chapter 3 code.
+
+=== Configuring Quarkus project
+
+You need to remove old mongodb client installed as extension. Open pom.xml file find and remove dependency of quarkus-mongodb-client.
+
+.Find and remove this block in pom.xml
+[source,xml]
+----
+<dependency>
+  <groupId>io.quarkus</groupId>
+  <artifactId>quarkus-mongodb-client</artifactId>
+</dependency>
+----
+
+Next, we need to install mongo with panache extension:
+
+[source,shell script]
+----
+$ ./mvnw quarkus:add-extension -Dextensions="io.quarkus:quarkus-mongodb-panache"
+----
+
+In the previous chapter we use `application.properties` resource file to config connection-string of mongo.
+Now, we need configure witch database we use.
+
+[source]
+----
+quarkus.mongodb.connection-string=mongodb://localhost:27017`
+quarkus.mongodb.database=quarkus-test
+----
+
+TIP: If you like to work with quarkus:dev started you need to have a mongo database started and cofigurated on before resource file.
+
+NOTE: When you package this project, it executes tests. If database isn't gone you could view some exemptions.
+
+=== Changing Repository
+
+Panache could be used changing Pojo extending PanacheMongoEntity or doing a repository.
+As we work with repository we choose this method.
+
+Open `PersonsRepository` file. This file we could remove all private method, let all methots empty and remove @Inject of MongoClient, too.
+We let the same methods in order to don't have to modify any other file if we can.
+
+
+[source, java]
+----
+@ApplicationScoped
+public class PersonsRepository{
+
+    public void add(Person person) {
+    }
+
+    public List<Person> getAll(int index, int size) {
+    }
+
+    public Optional<Person> get(String id) {
+    }
+
+    public Optional<Person> replace(String id, Person person) {
+    }
+
+    public Optional<Person> remove(String id) {
+    }
+}
+----
+
+This class needs to be inherited from `PanacheMongoRepository` and setting the type of Pojo (or else named Entity).
+
+----
+public class PersonsRepository implements PanacheMongoRepository<Person>
+----
+
+We get a lot of functions that manage the conversions of our data to mongo database so easy.
+We can save with persist method, we can get data with find method, and so on.
+
+.Full class reimplemented
+[source, java]
+----
+@ApplicationScoped
+public class PersonsRepository implements PanacheMongoRepository<Person> {
+
+    public void add(Person person) {
+        person.setId(UUID.randomUUID().toString());
+        persist(person);
+    }
+
+    public List<Person> getAll(int index, int size) {
+        return findAll().page(Page.of(index, size)).list();
+    }
+
+    public Optional<Person> get(String id) {
+        return find("_id", id).singleResultOptional();
+    }
+
+    public Optional<Person> replace(String id, Person person) {
+        person.setId(id);
+        update(person);
+        return get(person.getId());
+    }
+
+    public Optional<Person> remove(String id) {
+        Optional<Person> person = get(id);
+        person.ifPresent(this::delete);
+        return person;
+    }
+}
+----
+
+You could see that params of getAll are changed by index and size.
+This changed because panache helps us to work easy with pages.
+Before we need to set how many registers be skiped and size too.
+For this reason this is the only change that we might do on Service Query Parameters names.
+
+
+TIP: You could get more information of use of Panache on quarkus guide: +
+https://quarkus.io/guides/mongodb-panache
+
+=== Docker
+
+You could start this project as chapter 3 was explained with docker compose.
+You could manage database from env configuration instead of setting on `application.properties` resource file.
+
+
+
+[source,yaml]
+----
+version: '3'
+services:
+  quarkus:
+    build: .
+    environment:
+      - quarkus.mongodb.connection-string=mongodb://mongodb:27017
+      - quarkus.mongodb.database=quarkus-test
+    ports:
+      - "8080:8080"
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      - MONGO_DATA_DIR=/data/db
+    volumes:
+      - ./data/db:/data/db
+    ports:
+      - 27017:27017
+----
+
+
+
+
+
